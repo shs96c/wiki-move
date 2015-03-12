@@ -1,0 +1,50 @@
+# Introduction
+
+A higher level API integrating WebDriver and Hamcrest to give something in the style of LiFT is provided in the support project. We aim to allow writing tests that are very readable, almost like English sentences.
+
+Note: to use LiFT-style API you may want to add the Hamcrest library to the classpath unless you use "all-inclusive" selenium-selver-standalone distribution package.
+
+# Details
+
+This is very much work in progress at the moment, and the set of HTML tags that can be matched is quite limited at the moment, but easily expanded by following the patterns of what is there. Here's a quick start guide and an example:
+
+  * Extend `HamcrestWebDriverTestCase`
+  * Implement the `createDriver()` method to select a WebDriver implementation
+  * Use verbs like goTo(...) or clickOn(...) to navigate pages
+  * Use assertPresenceOf(...) to test the current page
+  * Use _Finder\_s to identify different elements in the page
+  * Use_Matcher\_s to test conditions of elements (mix webdriver and hamcrest at will)
+
+```
+package org.openqa.selenium.lift;
+
+import static org.openqa.selenium.lift.Finders.*;
+import static org.openqa.selenium.lift.Matchers.*;
+
+import static org.hamcrest.Matchers.*;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.lift.HamcrestWebDriverTestCase;
+
+public class GoogleTest extends HamcrestWebDriverTestCase {
+
+  @Override
+  protected WebDriver createDriver() {
+    return new HtmlUnitDriver();
+  }
+	
+  public void testHasAnImageSearchPage() throws Exception {
+		
+    goTo("http://www.google.com");
+		
+    assertPresenceOf(link("Images"));
+    assertPresenceOf(atLeast(4), links().with(text(not(equalTo("Images")))));
+		
+    clickOn(link("Images"));
+		
+    assertPresenceOf(title().with(text(equalTo("Google Image Search"))));
+  }
+
+}
+```
